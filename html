@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>Tạo ảnh mô hình đồ chơi</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      /* Bootstrap 4 Light Theme Palette */
+      --background-color: #f8f9fa;
+      --panel-background: #ffffff;
+      --text-color: #212529;
+      --primary-color: #007bff;
+      --primary-hover-color: #0069d9;
+      --border-color: #dee2e6;
+      --input-border-color: #ced4da;
+      --placeholder-text: #6c757d;
+      --danger-color: #dc3545;
+      --danger-hover-color: #c82333;
+    }
+
+    html {
+      background-color: var(--background-color);
+      box-sizing: border-box;
+    }
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: inherit;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+      margin: 0;
+      padding: 2rem;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      /* Bootstrap lg container width */
+    }
+
+    /* Header as Jumbotron */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://taoanhdep.com/wp-content/uploads/2025/09/mohinhdochoi.jpg');
+      background-size: cover;
+      background-position: center 25%;
+      padding: 10rem 2rem;
+      border-radius: 0.3rem;
+      color: white;
+      position: relative;
+    }
+
+    header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 3rem;
+    }
+
+    header p {
+      font-size: 1.25rem;
+      color: #f8f9fa;
+      opacity: .7;
+      font-weight: 300;
+
+    }
+
+    .editor-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* Panels as Cards */
+    .panel {
+      background-color: var(--panel-background);
+      border-radius: 0.3rem;
+      padding: 1.25rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+
+    /* Notice Panel */
+    .notice-panel {
+      background-color: #cfe2ff;
+      /* primary light background */
+      border: 1px solid #b6d4fe;
+      /* primary light border */
+      color: #084298;
+      /* primary text */
+      border-radius: 0.3rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .notice-panel strong {
+      font-weight: 600;
+    }
+
+    /* Input Panel */
+    #image-upload-container {
+      position: relative;
+    }
+
+    .upload-box {
+      border: 2px dashed var(--input-border-color);
+      border-radius: 0.25rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 150px;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+
+    .upload-box:hover,
+    .upload-box.dragover {
+      background-color: #e9ecef;
+      border-color: var(--primary-color);
+    }
+
+    #upload-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--placeholder-text);
+      text-align: center;
+      z-index: 1;
+      cursor: pointer;
+    }
+
+    #upload-label svg {
+      fill: var(--placeholder-text);
+      width: 42px;
+      height: 42px;
+    }
+
+    #generate-button svg,
+    #download-button svg {
+      fill: #fff;
+      width: 1em;
+      height: 1em;
+      vertical-align: -0.125em;
+    }
+
+    #image-preview {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      z-index: 2;
+      background-color: var(--panel-background);
+    }
+
+    #delete-image-button {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: white;
+      font-size: 20px;
+      line-height: 1;
+      text-align: center;
+      cursor: pointer;
+      z-index: 3;
+      padding: 0;
+      transition: background-color 0.2s;
+    }
+
+    #delete-image-button:hover {
+      background-color: rgba(0, 0, 0, 0.9);
+    }
+
+    .prompt-label {
+      display: block;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    /* Bootstrap form-control style */
+    input#name-input {
+      display: block;
+      width: 100%;
+      height: calc(1.5em + 0.75rem + 2px);
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-color);
+      background-color: var(--panel-background);
+      background-clip: padding-box;
+      border: 1px solid var(--input-border-color);
+      border-radius: 0.25rem;
+      transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    input#name-input:focus {
+      color: var(--text-color);
+      background-color: var(--panel-background);
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    }
+
+    .form-control {
+      display: block;
+      width: 100%;
+      height: calc(1.5em + 0.75rem + 2px);
+      padding: 0.375rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-color);
+      background-color: var(--panel-background);
+      background-clip: padding-box;
+      border: 1px solid var(--input-border-color);
+      border-radius: 0.25rem;
+      transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .form-control:focus {
+      color: var(--text-color);
+      background-color: var(--panel-background);
+      border-color: #80bdff;
+      outline: 0;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    }
+
+    /* Bootstrap custom radio button group */
+    .context-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .context-option {
+      display: flex;
+      align-items: center;
+    }
+
+    .context-option label {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.25rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .context-option input[type="radio"] {
+      display: none;
+    }
+
+    .context-option input[type="radio"]:checked+label {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .context-option label:hover {
+      background-color: #f1f3f5;
+    }
+
+    /* Button Styles */
+
+    #generate-button,
+    #download-button {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      font-size: 1.25rem;
+      line-height: 1.5;
+      border-radius: 0.3rem;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+      color: white;
+      font-weight: bold;
+      margin-top: 1rem;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      border: 0;
+      cursor: pointer;
+      transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    #generate-button:focus,
+    #download-button:focus {
+      color: #fff;
+      background-color: #0069d9;
+      border-color: #0062cc;
+      box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .5);
+    }
+
+    #generate-button:hover:not(:disabled),
+    #download-button:hover:not(:disabled) {
+      background-color: var(--primary-hover-color);
+      border-color: var(--primary-hover-color);
+      color: white;
+    }
+
+    #generate-button:disabled {
+      background-color: #6c757d;
+      border-color: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.65;
+    }
+
+    /* Output Panel */
+    .output-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      border: 1px solid var(--border-color);
+      border-radius: 0.25rem;
+      position: relative;
+      overflow: hidden;
+      background-color: #e9ecef;
+    }
+
+    #output-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    #output-placeholder {
+      color: var(--placeholder-text);
+      text-align: center;
+      padding: 1rem;
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      margin: auto;
+      display: block;
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 0.3rem;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+      transition: 0.3s;
+      cursor: pointer;
+      text-shadow: 0 1px 0 #000;
+    }
+
+    .close-modal:hover,
+    .close-modal:focus {
+      color: #bbb;
+      text-decoration: none;
+    }
+
+    /* Spinner */
+    #loading-spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--primary-color);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Helper class */
+    .hidden {
+      display: none !important;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--placeholder-text);
+    }
+
+    footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Header credit under header */
+    .header-credit {
+      text-align: center;
+      color: var(--placeholder-text);
+      margin: 0.5rem 0 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .header-credit a {
+      color: inherit;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .header-credit a:hover {
+      text-decoration: underline;
+    }
+
+    header .header-credit {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.85rem;
+      margin: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+
+      /* Bootstrap md breakpoint */
+      .editor-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 576px) {
+
+      /* Bootstrap sm breakpoint */
+      body {
+        padding: 0;
+      }
+
+      header,
+      footer,
+      .panel {
+        border-radius: 0;
+        border: 0;
+        margin: 0;
+        padding: 1rem 0;
+      }
+
+      footer {
+        padding-top: 0;
+      }
+
+      .context-options {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 2.25rem;
+      }
+
+      header {
+        padding: 5rem 1rem;
+        border-radius: .25rem;
+      }
+
+      header p {
+        font-size: 1.1rem;
+      }
+
+      .editor-layout {
+        gap: 0;
+      }
+
+      .notice-panel {
+        padding: 1rem;
+        margin-top: .5rem;
+        border-radius: .25rem;
+      }
+    }
+
+    /* Dark Mode Styles */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background-color: #1b1c1d;
+        --panel-background: #1b1c1d;
+        --text-color: #f8f9fa;
+        --border-color: #545556;
+        --input-border-color: #444444;
+        --placeholder-text: #969696;
+      }
+
+      .notice-panel {
+        background-color: #0b213f;
+        /* dark navy */
+        border-color: #1b4b91;
+        /* deep primary border */
+        color: #cfe2ff;
+        /* light primary text */
+      }
+
+      header p {
+        color: #f8f9fa;
+      }
+
+      input#name-input {
+        background-color: #2d2d2d;
+      }
+
+      input#name-input:focus {
+        background-color: #222;
+      }
+
+      .upload-box:hover,
+      .upload-box.dragover {
+        background-color: #333;
+      }
+
+      .context-option input[type="radio"]:checked+label {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+      }
+
+      .context-option label:hover {
+        background-color: #333;
+      }
+
+      .context-option label {
+        border-color: var(--border-color);
+      }
+
+      .output-area {
+        background-color: #222;
+        border-color: var(--border-color);
+      }
+
+
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Tạo ảnh mô hình đồ chơi</h1>
+      <p>Tải ảnh nhân vật lên, nhập tên, chọn bối cảnh và để AI sáng tạo.</p>
+      <div class="header-credit">Ứng dụng này được tạo bởi <a href="https://taoanhdep.com/" target="_blank"
+          rel="noopener noreferrer">Tạo ảnh đẹp</a></div>
+    </header>
+    <div class="panel notice-panel" role="alert">
+      <strong>Lưu ý:</strong> Người dùng cần đăng nhập trước khi sử dụng. Nút <em>Đăng nhập</em> nằm ở góc phải trên
+      cùng.
+    </div>
+    <main class="editor-layout">
+
+      <div class="panel input-panel">
+        <h2>Upload ảnh</h2>
+        <div class="input-area">
+          <div id="image-upload-container">
+            <div id="image-upload-box" class="upload-box" aria-labelledby="upload-label-text">
+              <img id="image-preview" src="#" alt="Xem trước hình ảnh bạn đã tải lên" class="hidden" />
+              <label id="upload-label">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+                  <path
+                    d="M537.6 226.6c4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32c-88.4 0-160 71.6-160 160 0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336c0 79.5 64.5 144 144 144h368c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4zm-139.9 63.7l-10.8 10.8c-9.6 9.6-25.2 9.3-34.5-.5L320 266.1V392c0 13.3-10.7 24-24 24h-16c-13.3 0-24-10.7-24-24V266.1l-32.4 34.5c-9.3 9.9-24.9 10.1-34.5.5l-10.8-10.8c-9.4-9.4-9.4-24.6 0-33.9l92.7-92.7c9.4-9.4 24.6-9.4 33.9 0l92.7 92.7c9.4 9.4 9.4 24.6.1 33.9z">
+                  </path>
+                </svg>
+                <span id="upload-label-text">Nhấp, kéo thả, hoặc dán (Ctrl/⌘+V)</span>
+              </label>
+              <input type="file" id="image-upload" accept="image/*" class="hidden" aria-hidden="true">
+            </div>
+            <button id="delete-image-button" title="Xóa ảnh" class="hidden"><svg xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 320 512"
+                style="
+    fill: #fff;
+    width: 15px;
+    height: 15px;
+"><!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) -->
+                <path
+                  d="M193.94 256L296.5 153.44l21.15-21.15c3.12-3.12 3.12-8.19 0-11.31l-22.63-22.63c-3.12-3.12-8.19-3.12-11.31 0L160 222.06 36.29 98.34c-3.12-3.12-8.19-3.12-11.31 0L2.34 120.97c-3.12 3.12-3.12 8.19 0 11.31L126.06 256 2.34 379.71c-3.12 3.12-3.12 8.19 0 11.31l22.63 22.63c3.12 3.12 8.19 3.12 11.31 0L160 289.94 262.56 392.5l21.15 21.15c3.12 3.12 8.19 3.12 11.31 0l22.63-22.63c3.12-3.12 3.12-8.19 0-11.31L193.94 256z">
+                </path>
+              </svg></button>
+          </div>
+
+          <label for="name-input" class="prompt-label">Nhập tên:</label>
+          <input type="text" id="name-input" placeholder="Nhập tên của bạn">
+
+          <label for="context-select" class="prompt-label">Chọn bối cảnh:</label>
+          <select id="context-select" class="form-control">
+            <option value="0">🖥️ Bàn làm việc</option>
+            <option value="1">💻 Bàn làm việc Macbook</option>
+            <option value="2">🇻🇳 Quảng trường 2/9</option>
+            <option value="3">🎮 Phòng Gaming</option>
+            <option value="4">📸 Studio Ảnh</option>
+            <option value="5">📚 Thư Viện Nghệ Thuật</option>
+            <option value="6">🖼️ Phòng Triển Lãm</option>
+            <option value="7">☕ Quán Cà Phê</option>
+            <option value="8">👐 Cầm mô hình lên</option>
+            <option value="9">🤖 Cạnh mô hình khác</option>
+          </select>
+
+          <div id="box-customization-section">
+            <label for="box-type-select" class="prompt-label">Tùy chỉnh hộp:</label>
+            <select id="box-type-select" class="form-control">
+              <option value="printed">🧃 Hộp in hình</option>
+              <option value="transparent">🔲 Hộp đồ chơi trong suốt</option>
+              <option value="polybag">🛍️ Túi nilon trong suốt</option>
+              <option value="acrylic">🪟 Hộp trưng bày Acrylic</option>
+              <option value="minimal">📦 Bao bì tối giản</option>
+            </select>
+          </div>
+
+          <button id="generate-button" disabled><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path
+                d="M278.06 256L444.48 89.57c4.69-4.69 4.69-12.29 0-16.97-32.8-32.8-85.99-32.8-118.79 0L210.18 188.12l-24.86-24.86c4.31-10.92 6.68-22.81 6.68-35.26 0-53.02-42.98-96-96-96S0 74.98 0 128s42.98 96 96 96c4.54 0 8.99-.32 13.36-.93L142.29 256l-32.93 32.93c-4.37-.61-8.83-.93-13.36-.93-53.02 0-96 42.98-96 96s42.98 96 96 96 96-42.98 96-96c0-12.45-2.37-24.34-6.68-35.26l24.86-24.86L325.69 439.4c32.8 32.8 85.99 32.8 118.79 0 4.69-4.68 4.69-12.28 0-16.97L278.06 256zM96 160c-17.64 0-32-14.36-32-32s14.36-32 32-32 32 14.36 32 32-14.36 32-32 32zm0 256c-17.64 0-32-14.36-32-32s14.36-32 32-32 32 14.36 32 32-14.36 32-32 32z">
+              </path>
+            </svg> Tạo ảnh</button>
+        </div>
+      </div>
+      <div class="panel output-panel">
+        <h2>Kết quả</h2>
+        <div class="output-area">
+          <div id="loading-spinner" class="hidden"></div>
+          <p id="output-placeholder">Hình ảnh được tạo sẽ xuất hiện ở đây</p>
+          <img id="output-image" src="#" alt="Hình ảnh do AI tạo ra" class="hidden" />
+        </div>
+        <a id="download-button" href="#" class="hidden" download><svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 640 512">
+            <path
+              d="M537.6 226.6c4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32c-88.4 0-160 71.6-160 160 0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336c0 79.5 64.5 144 144 144h368c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4zm-139.9 93L305 412.3c-9.4 9.4-24.6 9.4-33.9 0l-92.7-92.7c-9.4-9.4-9.4-24.6 0-33.9l10.8-10.8c9.6-9.6 25.2-9.3 34.5.5l32.4 34.5V184c0-13.3 10.7-24 24-24h16c13.3 0 24 10.7 24 24v125.9l32.4-34.5c9.3-9.9 24.9-10.1 34.5-.5l10.8 10.8c9.2 9.3 9.2 24.5-.1 33.9z">
+            </path>
+          </svg> Tải ảnh về</a>
+      </div>
+
+      <!-- History panel removed -->
+    </main>
+
+    <footer>
+      <p>Ứng dụng Gemini Canvas tạo bởi <a href="https://taoanhdep.com/" target="_blank" rel="noopener noreferrer">Tạo
+          ảnh
+          đẹp</a></p>
+    </footer>
+
+  </div>
+
+  <!-- Image modal removed -->
+
+  <script type="module">
+    // DOM Elements
+    const imageUploadBox = document.getElementById('image-upload-box');
+    const imageUploadInput = document.getElementById('image-upload');
+    const imagePreview = document.getElementById('image-preview');
+    const uploadLabel = document.getElementById('upload-label');
+    const deleteImageButton = document.getElementById('delete-image-button');
+    const nameInput = document.getElementById('name-input');
+    const contextSelect = document.getElementById('context-select');
+    const boxTypeSelect = document.getElementById('box-type-select');
+    const generateButton = document.getElementById('generate-button');
+    const outputImage = document.getElementById('output-image');
+    const downloadButton = document.getElementById('download-button');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    const outputPlaceholder = document.getElementById('output-placeholder');
+    const boxCustomizationSection = document.getElementById('box-customization-section');
+
+    // History and modal DOM references removed
+
+    // State
+    let uploadedImage = null;
+
+    const promptTemplates = [
+      // 0: Bàn làm việc
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment.\nPlace the figure on a computer desk, using a circular transparent acrylic base without any text. On the computer screen, display the ZBrush modeling process of the figure. Next to the computer screen, place [BOX_DESCRIPTION].",
+      // 1: Macbook
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment. Place the figure on a computer desk, using a circular transparent acrylic base without any text. On the desk, show a MacBook with its screen displaying the ZBrush modeling process of the same figure. Next to the MacBook, place [BOX_DESCRIPTION]. Cinematic lighting, high-detail textures, realistic materials, shallow depth of field, professional photography look.",
+      // 2: Quảng trường
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment. Place the figure on a computer desk, using a circular transparent acrylic base without any text. On the desk, show a MacBook with its screen displaying the ZBrush modeling process of the same figure. Next to the MacBook, place [BOX_DESCRIPTION]. \nIn the background, through the window or behind the desk, show a large public square filled with thousands of people wearing red T-shirts with yellow stars, celebrating joyfully. Add vibrant lighting, flags waving, and a festive atmosphere. Make sure the square feels energetic and patriotic, while the figure scene remains professionally staged and cinematic. Use high-detail textures, realistic lighting, shallow depth of field, and editorial photography quality.",
+      // 3: Phòng Gaming
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment. Place the figure on a computer desk, using a circular transparent acrylic base without any text.\nOn the desk, display a high-resolution gaming monitor showing the ZBrush modeling process of the same figure. Next to the screen, include a PlayStation 5 console with its controller placed nearby. Scatter multiple stacks of US dollar bills and shiny 9999 gold bars across the desk surface. Also place [BOX_DESCRIPTION] beside the figure.\nSet the entire scene inside a stylish gaming room, with RGB lighting, gaming chair, LED strips, and high-tech accessories. The atmosphere should feel luxurious, modern, and dynamic — with cinematic lighting, shallow depth of field, high-detail textures, and photorealistic materials.",
+      // 4: Studio Ảnh
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment. Place the figure on a sleek photography studio desk, using a circular transparent acrylic base without any text. On the desk, display a high-resolution monitor showing the ZBrush modeling process of the same figure. Next to the monitor, place [BOX_DESCRIPTION].\nSurround the scene with professional photography lights, softboxes, tripods, and camera gear. Add a cinematic photography atmosphere with dramatic spotlights, shallow depth of field, and ultra-realistic materials.",
+      // 5: Thư Viện Nghệ Thuật
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment. Place the figure on a wooden desk inside a large art library, using a circular transparent acrylic base without any text. On the desk, show a laptop with its screen displaying the ZBrush modeling process of the same figure. Next to the laptop, place [BOX_DESCRIPTION].\nFill the background with shelves of art books, plaster sculptures, and warm ambient light, creating a scholarly yet cinematic atmosphere. Add realistic textures, detailed shadows, and an editorial photo look.",
+      // 6: Phòng Triển Lãm
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment. Place the figure on a pedestal-like desk inside a modern exhibition hall, using a circular transparent acrylic base without any text. On the desk, display a large screen showcasing the ZBrush modeling process of the same figure. Next to the screen, include [BOX_DESCRIPTION].\nSurround the area with gallery spotlights, polished concrete floors, reflective glass panels, and a cinematic exhibition mood. Add subtle reflections and high-detail materials to emphasize realism.",
+      // 7: Quán Cà Phê
+      "Create a 1/7 scale commercialized figure of the character in the illustration, in a realistic style and environment. Place the figure on a wooden coffee shop desk, using a circular transparent acrylic base without any text. On the desk, show a MacBook Pro with its screen displaying the ZBrush modeling process of the same figure. Next to the laptop, place [BOX_DESCRIPTION].\nAdd cozy coffee cups, latte art, ambient hanging lights, and blurred background of other customers. Capture the mood with warm tones, shallow depth of field, cinematic photography quality, and realistic materials.",
+      // 8: Cầm mô hình lên
+      "Create a 1/7 scale commercial model of the character in the illustration, in a realistic style and environment. The model is held in the hand, with a circular transparent acrylic base without letters. The scene is in a room filled with collectible models and toys, creating the feeling of a figure player's room.",
+      // 9: Cạnh mô hình khác
+      "Create a 1/7 scale commercial model of the character in the illustration, in a realistic style and environment. Place the model on a display table, using a circular transparent acrylic base without letters. Around the model, arrange other popular anime character models such as Tanjiro (Kimetsu no Yaiba), Goku (Dragon Ball), and Zero Two (Darling in the Franxx), creating a diverse collection. The setting is a room full of toys and figures, with a model display shelf.",
+    ];
+
+    // --- UTILITY FUNCTIONS ---
+
+    /**
+     * Converts a File object to a base64 encoded string.
+     */
+    function fileToGenerativePart(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            const base64Data = reader.result.split(',')[1];
+            resolve({
+              mimeType: file.type,
+              data: base64Data,
+            });
+          } else {
+            reject(new Error("Không thể đọc tệp dưới dạng chuỗi."));
+          }
+        };
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setInputsDisabled(disabled) {
+      generateButton.disabled = disabled;
+      nameInput.disabled = disabled;
+      contextSelect.disabled = disabled;
+      if (boxTypeSelect) boxTypeSelect.disabled = disabled;
+      deleteImageButton.disabled = disabled;
+      imageUploadInput.disabled = disabled;
+    }
+
+    /**
+     * Updates the UI to show a loading state.
+     */
+    function showLoading() {
+      if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+      if (outputPlaceholder) outputPlaceholder.classList.add('hidden');
+      if (outputImage) outputImage.classList.add('hidden');
+      if (downloadButton) downloadButton.classList.add('hidden');
+      setInputsDisabled(true);
+    }
+
+    /**
+     * Hides the loading state and updates the UI with the result or an error.
+     */
+    function hideLoading(imageUrl = null, errorMessage = null) {
+      if (loadingSpinner) loadingSpinner.classList.add('hidden');
+      setInputsDisabled(false);
+      updateGenerateButtonState(); // Re-evaluate button state
+
+      if (imageUrl && outputImage) {
+        // Tách mimeType và data base64
+        const parts = imageUrl.split(',');
+        const mimeMatch = parts[0].match(/:(.*?);/);
+        const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
+        const byteString = atob(parts[1]);
+        const byteArray = new Uint8Array(byteString.length);
+        for (let i = 0; i < byteString.length; i++) {
+          byteArray[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([byteArray], { type: mimeType });
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Gán vào UI
+        outputImage.src = blobUrl;
+        outputImage.classList.remove('hidden');
+        if (outputPlaceholder) outputPlaceholder.classList.add('hidden');
+        if (downloadButton) {
+          downloadButton.href = blobUrl;
+          const extension = mimeType.split('/')[1] || 'png';
+          downloadButton.download = `taoanhdep.com__mo_hinh_ai.${extension}`;
+          downloadButton.classList.remove('hidden');
+        }
+      } else {
+        if (outputPlaceholder) {
+          outputPlaceholder.textContent = errorMessage ?? 'Hình ảnh được tạo sẽ xuất hiện ở đây';
+          outputPlaceholder.classList.remove('hidden');
+        }
+        if (outputImage) {
+          outputImage.src = '#';
+          outputImage.classList.add('hidden');
+        }
+        if (downloadButton) {
+          downloadButton.href = '#';
+          downloadButton.classList.add('hidden');
+        }
+      }
+    }
+
+    /**
+     * Validates inputs and enables/disables the generate button.
+     */
+    function updateGenerateButtonState() {
+      const contextSelected = contextSelect.value !== '';
+      const isReady = uploadedImage !== null && contextSelected;
+      generateButton.disabled = !isReady;
+    }
+
+    /**
+     * Shows or hides the box customization options based on the selected context.
+     */
+    function toggleBoxOptionsVisibility() {
+      if (boxCustomizationSection) {
+        const value = contextSelect.value;
+        // Hide for "Cầm mô hình lên" (value "8") and "Cạnh mô hình khác" (value "9")
+        if (value === '8' || value === '9') {
+          boxCustomizationSection.classList.add('hidden');
+        } else {
+          boxCustomizationSection.classList.remove('hidden');
+        }
+      }
+    }
+
+
+    // --- HISTORY FUNCTIONS REMOVED ---
+    // --- MODAL FUNCTIONS REMOVED ---
+
+    // --- EVENT LISTENERS & HANDLERS ---
+
+    /**
+     * Handles the selected file (from upload or drag-drop).
+     */
+    async function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) {
+        if (file) console.log('Vui lòng chỉ chọn hoặc kéo thả tệp hình ảnh.');
+        return;
+      }
+
+      try {
+        uploadedImage = await fileToGenerativePart(file);
+        const objectURL = URL.createObjectURL(file);
+        if (imagePreview) {
+          imagePreview.src = objectURL;
+          imagePreview.classList.remove('hidden');
+          imagePreview.onload = () => {
+            URL.revokeObjectURL(objectURL); // Clean up memory
+          };
+        }
+        if (uploadLabel) uploadLabel.classList.add('hidden');
+        if (deleteImageButton) deleteImageButton.classList.remove('hidden');
+        updateGenerateButtonState();
+      } catch (error) {
+        console.error('Lỗi xử lý tệp:', error);
+        uploadedImage = null;
+        // Use a custom alert/modal in a real app
+        alert('Không thể xử lý tệp đã tải lên.');
+        updateGenerateButtonState();
+      }
+    }
+
+    // Make the entire upload box clickable to trigger the file input
+    imageUploadBox.addEventListener('click', () => {
+      imageUploadInput.click();
+    });
+
+    // Listener for file input change (after clicking the box)
+    imageUploadInput.addEventListener('change', (event) => {
+      const target = event.target;
+      handleFile(target.files?.[0]);
+    });
+
+    // Listeners for drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      imageUploadBox.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }, false);
+    });
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      imageUploadBox.addEventListener(eventName, () => {
+        imageUploadBox.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      imageUploadBox.addEventListener(eventName, () => {
+        imageUploadBox.classList.remove('dragover');
+      }, false);
+    });
+
+    imageUploadBox.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const file = dt?.files?.[0];
+      handleFile(file);
+    });
+
+    // Enable paste-to-upload (Ctrl/⌘+V)
+    document.addEventListener('paste', (e) => {
+      const dt = e.clipboardData;
+      if (!dt) return;
+
+      let file = null;
+
+      // Prefer direct files if present
+      if (dt.files && dt.files.length > 0 && dt.files[0].type && dt.files[0].type.startsWith('image/')) {
+        file = dt.files[0];
+      } else if (dt.items && dt.items.length) {
+        // Fallback: scan clipboard items for an image blob
+        for (const item of dt.items) {
+          if (item.kind === 'file' && item.type && item.type.startsWith('image/')) {
+            const blob = item.getAsFile();
+            if (blob) {
+              const ext = (blob.type.split('/')[1] || 'png');
+              file = new File([blob], `pasted-image.${ext}`, { type: blob.type });
+              break;
+            }
+          }
+        }
+      }
+
+      if (file) {
+        e.preventDefault();
+        handleFile(file);
+      }
+    });
+
+
+    deleteImageButton.addEventListener('click', (e) => {
+      e.stopPropagation(); // Prevent the upload box click event from firing
+      uploadedImage = null;
+      imageUploadInput.value = '';
+      if (imagePreview) {
+        imagePreview.src = '#';
+        imagePreview.classList.add('hidden');
+      }
+      if (uploadLabel) uploadLabel.classList.remove('hidden');
+      if (deleteImageButton) deleteImageButton.classList.add('hidden');
+      updateGenerateButtonState();
+    });
+
+    contextSelect.addEventListener('change', () => {
+      updateGenerateButtonState();
+      toggleBoxOptionsVisibility();
+    });
+
+    generateButton.addEventListener('click', async () => {
+      if (window.innerWidth <= 576) {
+        setTimeout(() => {
+          const outputPanel = document.querySelector('.output-panel');
+          if (outputPanel) outputPanel.scrollIntoView({ behavior: 'smooth' });
+        }, 300);
+      }
+      const name = nameInput.value.trim() || 'BANDAI';
+      const templateIndex = parseInt(contextSelect.value, 10);
+
+      if (!uploadedImage || isNaN(templateIndex)) {
+        alert('Vui lòng tải ảnh lên và chọn một bối cảnh.');
+        return;
+      }
+
+      const promptTemplate = promptTemplates[templateIndex];
+      let finalPrompt = promptTemplate;
+
+      if (templateIndex < 8) {
+        const boxType = boxTypeSelect.value;
+        let boxDescription = '';
+        switch (boxType) {
+          case 'transparent':
+            boxDescription = "Collectible box with clear plastic window, large portrait of the figure printed on the front, labeled 'YOUR NAME – 1:7 Scale Statue – Limited Collectible Edition'";
+            break;
+          case 'polybag':
+            boxDescription = "A clear plastic bag with a resealable lid, containing the character model, with a printed label featuring an illustration of the character and the name 'YOUR NAME'";
+            break;
+          case 'acrylic':
+            boxDescription = "Next to it is a clear acrylic display cabinet with a mirror base and UV protection, inside is a smaller version of the same character, with a plaque printed with the character's name 'YOUR NAME''";
+            break;
+          case 'minimal':
+            boxDescription = "a minimalistic matte black box with a subtle silver foil logo and a clean printed image of the character on the front, labeled 'YOUR NAME'";
+            break;
+          default:
+            boxDescription = "a YOUR NAME-style toy packaging box printed with a large illustration of the character on the front";
+        }
+        const finalBoxDescription = boxDescription.replace(/YOUR NAME/g, name);
+        finalPrompt = promptTemplate.replace(/\[BOX_DESCRIPTION\]/g, finalBoxDescription);
+      }
+
+      showLoading();
+
+      try {
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`;
+
+        const imagePart = { inlineData: uploadedImage };
+        const textPart = { text: finalPrompt };
+
+        const payload = {
+          contents: [{ parts: [imagePart, textPart] }],
+          generationConfig: {
+            responseModalities: ["IMAGE", "TEXT"],
+          },
+        };
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          if (response.status === 403) {
+            throw new Error('403 Forbidden');
+          }
+          if (response.status === 429) {
+            throw new Error('429 Too Many Requests');
+          }
+          const errorData = await response.json();
+          throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        const imageOutputPart = result.candidates?.[0]?.content?.parts?.find(part => part.inlineData);
+
+        if (imageOutputPart && imageOutputPart.inlineData) {
+          const { data, mimeType } = imageOutputPart.inlineData;
+          const imageUrl = `data:${mimeType};base64,${data}`;
+          hideLoading(imageUrl);
+        } else {
+          const textResponse = result.candidates?.[0]?.content?.parts?.find(part => part.text)?.text.trim();
+          const errorMessage = textResponse
+            ? `Không thể tạo ảnh. Model phản hồi: "${textResponse}"`
+            : "Không thể tạo ảnh. Phản hồi không chứa hình ảnh.";
+          hideLoading(null, errorMessage);
+        }
+      } catch (error) {
+        console.error('Lỗi khi tạo nội dung:', error);
+        let errorMessage = 'Đã xảy ra lỗi khi tạo hình ảnh. Vui lòng thử lại.';
+        if (error instanceof Error) {
+          if (error.message.includes('403 Forbidden')) {
+            errorMessage = 'Bạn cần đăng nhập tài khoản Google để sử dụng.';
+          } else if (error.message.includes('429 Too Many Requests')) {
+            errorMessage = 'Bạn thử quá nhanh hãy thử lại sau';
+          }
+        }
+        hideLoading(null, errorMessage);
+      }
+    });
+
+    // History and modal event listeners removed
+
+    // Initial state check
+    updateGenerateButtonState();
+    toggleBoxOptionsVisibility();
+  </script>
+</body>
+
+</html>
